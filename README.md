@@ -1,3 +1,4 @@
+[THIS PROJECT IS MADE TO RUN LOCALLY]
 🚀 Credit Approval System
 
 A comprehensive Django REST Framework application for credit approval and loan management, built as part of an internship assignment.
@@ -44,6 +45,7 @@ Docker Compose
 Git
 
 🏁 Quick Start
+
 1️⃣ Clone the Repository
 git clone https://github.com/yourusername/credit-approval-system.git
 cd credit-approval-system
