@@ -1,4 +1,5 @@
 [THIS PROJECT IS MADE TO RUN LOCALLY]
+
 🚀 Credit Approval System
 
 A comprehensive Django REST Framework application for credit approval and loan management, built as part of an internship assignment.
