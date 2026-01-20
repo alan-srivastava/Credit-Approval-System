@@ -1,140 +1,195 @@
-Credit Approval System
-A comprehensive Django REST Framework application for credit approval and loan management, built as part of an internship assignment. The system evaluates loan applications based on customer credit scores, historical payment data, and financial metrics.
+🚀 Credit Approval System
 
-Direct command for run:
-Single Command Startup: docker-compose up --build starts everything
-Data Loading: Run docker-compose run --rm web python [manage.py](http://_vscodecontentref_/0) load_data to load Excel data
-API Testing: Use the provided cURL examples or tools like Postman
-Database Access: Use the psql commands above to inspect data
-Error Handling: All APIs include proper validation and error responses
-Background Tasks: Celery processes Excel data asynchronously 
+A comprehensive Django REST Framework application for credit approval and loan management, built as part of an internship assignment.
+The system evaluates loan applications based on customer credit scores, historical payment data, and financial metrics, with full support for background processing and containerized deployment.
 
-🚀 Features
-Customer Registration: Register new customers with automatic credit limit calculation
-Credit Score Evaluation: Advanced scoring based on payment history, loan activity, and current debt
-Loan Approval Logic: Intelligent approval/rejection with interest rate adjustments
-RESTful APIs: Complete API suite for all operations
-Background Data Processing: Celery-powered Excel data ingestion
-Database Management: PostgreSQL with proper relationships
-Containerization: Fully dockerized for easy deployment
+📌 Key Highlights
+
+Single-command startup using Docker Compose
+
+Automated credit score evaluation
+
+Intelligent loan approval & interest rate adjustment
+
+Asynchronous Excel data ingestion using Celery
+
+RESTful API design with proper validation
+
+Production-ready PostgreSQL schema
+
 🛠 Tech Stack
+
 Backend: Django 5.2, Django REST Framework
+
 Database: PostgreSQL
-Task Queue: Celery with Redis
+
+Task Queue: Celery
+
+Message Broker: Redis
+
 Containerization: Docker & Docker Compose
+
 Data Processing: Pandas, OpenPyXL
-Development: Python 3.10
+
+Language: Python 3.10
+
 📋 Prerequisites
-Docker and Docker Compose installed
-Git (for cloning the repository)
+
+Ensure the following are installed:
+
+Docker
+
+Docker Compose
+
+Git
+
 🏁 Quick Start
-1. Clone the Repository:
+1️⃣ Clone the Repository
 git clone https://github.com/yourusername/credit-approval-system.git
 cd credit-approval-system
 
-2. Start the Application
-Everything runs from a single command!
+2️⃣ Start the Application (Single Command)
 docker-compose up --build
 
-This command will:
+
+This single command will:
+
 Build all Docker images
+
 Start PostgreSQL database
+
 Start Redis for Celery
+
 Run Django migrations
-Start the web server on http://localhost:8000
-Start Celery worker for background tasks
-3. Load Sample Data (Optional)
+
+Start the Django web server at http://localhost:8000
+
+Start Celery workers for background tasks
+
+3️⃣ Load Sample Data (Optional)
+
 In a new terminal:
+
 docker-compose run --rm web python manage.py load_data
-This loads customer and loan data from customer_data.xlsx and loan_data.xlsx using background tasks.
+
+
+This command loads customer and loan data from:
+
+customer_data.xlsx
+
+loan_data.xlsx
+
+The ingestion runs asynchronously using Celery.
 
 📖 API Documentation
-The API is available at http://localhost:8000. All endpoints return JSON responses.
 
-Endpoints
-1. Register Customer
+Base URL:
+
+http://localhost:8000
+
+
+All endpoints return JSON responses.
+
+🔹 1. Register Customer
+
 POST /register
+
 {
+  "first_name": "John",
+  "last_name": "Doe",
+  "age": 30,
+  "monthly_income": 50000,
+  "phone_number": 1234567890
+}
+
+
+Response
+
+{
+  "customer_id": 1,
+  "name": "John Doe",
+  "age": 30,
+  "monthly_income": 50000,
+  "approved_limit": 1800000,
+  "phone_number": 1234567890
+}
+
+🔹 2. Check Loan Eligibility
+
+POST /check-eligibility
+
+{
+  "customer_id": 1,
+  "loan_amount": 100000,
+  "interest_rate": 10,
+  "tenure": 12
+}
+
+
+Response
+
+{
+  "customer_id": 1,
+  "approval": true,
+  "interest_rate": 10,
+  "corrected_interest_rate": 10,
+  "tenure": 12,
+  "monthly_installment": 8791.59
+}
+
+🔹 3. Create Loan
+
+POST /create-loan
+
+{
+  "customer_id": 1,
+  "loan_amount": 100000,
+  "interest_rate": 10,
+  "tenure": 12
+}
+
+
+Response
+
+{
+  "loan_id": 1,
+  "customer_id": 1,
+  "loan_approved": true,
+  "message": "Loan approved",
+  "monthly_installment": 8791.59
+}
+
+🔹 4. View Loan Details
+
+GET /view-loan/<loan_id>
+
+{
+  "loan_id": 1,
+  "customer": {
+    "id": 1,
     "first_name": "John",
     "last_name": "Doe",
-    "age": 30,
-    "monthly_income": 50000,
-    "phone_number": 1234567890
-}
-Response:
-{
-    "customer_id": 1,
-    "name": "John Doe",
-    "age": 30,
-    "monthly_income": 50000,
-    "approved_limit": 1800000,
-    "phone_number": 1234567890
+    "phone_number": 1234567890,
+    "age": 30
+  },
+  "loan_amount": 100000,
+  "interest_rate": 10,
+  "monthly_installment": 8791.59,
+  "tenure": 12
 }
 
-2. Check Loan Eligibility
-POST /check-eligibility
-{
-    "customer_id": 1,
-    "loan_amount": 100000,
-    "interest_rate": 10,
-    "tenure": 12
-}
-Response:
-{
-    "customer_id": 1,
-    "approval": true,
-    "interest_rate": 10,
-    "corrected_interest_rate": 10,
-    "tenure": 12,
-    "monthly_installment": 8791.59
-}
+🔹 5. View Customer Loans
 
-3. Create Loan
-POST /create-loan
-{
-    "customer_id": 1,
-    "loan_amount": 100000,
-    "interest_rate": 10,
-    "tenure": 12
-}
-Response:
-{
+GET /view-loans/<customer_id>
+
+[
+  {
     "loan_id": 1,
-    "customer_id": 1,
-    "loan_approved": true,
-    "message": "Loan approved",
-    "monthly_installment": 8791.59
-}
-
-4. View Loan Details
-GET /view-loan/<loan_id>
-Response:
-{
-    "loan_id": 1,
-    "customer": {
-        "id": 1,
-        "first_name": "John",
-        "last_name": "Doe",
-        "phone_number": 1234567890,
-        "age": 30
-    },
     "loan_amount": 100000,
     "interest_rate": 10,
     "monthly_installment": 8791.59,
-    "tenure": 12
-}
-
-5. View Customer Loans
-GET /view-loans/<customer_id>
-Response:
-[
-    {
-        "loan_id": 1,
-        "loan_amount": 100000,
-        "interest_rate": 10,
-        "monthly_installment": 8791.59,
-        "repayments_left": 12
-    }
+    "repayments_left": 12
+  }
 ]
 
 🧪 Testing the Application
@@ -157,7 +212,7 @@ curl -X POST http://localhost:8000/create-loan \
 # View loans
 curl http://localhost:8000/view-loans/1
 
-Database Inspection:
+🗄 Database Inspection
 # View customers
 docker-compose exec db psql -U postgres -d creditdb -c "SELECT * FROM core_customer LIMIT 5;"
 
@@ -168,44 +223,74 @@ docker-compose exec db psql -U postgres -d creditdb -c "SELECT * FROM core_loan 
 docker-compose exec db psql -U postgres -d creditdb -c "SELECT COUNT(*) FROM core_customer; SELECT COUNT(*) FROM core_loan;"
 
 📊 Credit Score Logic
-The system calculates credit scores based on:
+Credit Score Factors
 
-Past Loans Paid on Time: Higher scores for better payment history
-Number of Loans Taken: Balanced loan activity
-Loan Activity in Current Year: Recent borrowing patterns
-Loan Approved Volume: Total approved amounts
-Approval Criteria:
+Past loans paid on time
 
-Credit Score > 50: Approve loan
-50 > Score > 30: Approve with interest rate > 12%
-30 > Score > 10: Approve with interest rate > 16%
-Score ≤ 10: Reject loan
-Additional checks: Current debt ≤ approved limit, EMI ≤ 50% of monthly salary
+Number of loans taken
+
+Loan activity in the current year
+
+Total approved loan volume
+
+Approval Rules
+Credit Score	Decision
+> 50	Loan Approved
+30–50	Approved with interest rate > 12%
+10–30	Approved with interest rate > 16%
+≤ 10	Loan Rejected
+Additional Constraints
+
+Current debt ≤ approved credit limit
+
+EMI ≤ 50% of monthly salary
+
 🗄 Database Schema
 Customer Model
-id: Primary key
-first_name, last_name: Customer name
-age: Customer age
-phone_number: Contact number
-monthly_salary: Monthly income
-approved_limit: Calculated credit limit (36 × monthly_salary)
-current_debt: Sum of outstanding loan amounts
+
+id (Primary Key)
+
+first_name, last_name
+
+age
+
+phone_number
+
+monthly_salary
+
+approved_limit (36 × monthly salary)
+
+current_debt
+
 Loan Model
-id: Primary key
-customer_id: Foreign key to Customer
-loan_amount: Approved loan amount
-tenure: Loan duration in months
-interest_rate: Annual interest rate
-monthly_installment: Calculated EMI
-emis_paid_on_time: Number of timely payments
-start_date, end_date: Loan period
-repayments_left: Remaining EMIs
+
+id (Primary Key)
+
+customer_id (Foreign Key)
+
+loan_amount
+
+tenure
+
+interest_rate
+
+monthly_installment
+
+emis_paid_on_time
+
+start_date, end_date
+
+repayments_left
 
 🛑 Stopping the Application
 docker-compose down
 
 🤝 Contributing
+
 Fork the repository
+
 Create a feature branch
+
 Make changes and test
+
 Submit a pull request
